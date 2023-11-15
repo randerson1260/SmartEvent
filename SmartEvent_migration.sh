@@ -293,6 +293,13 @@ function restore(){
 	formatScreen "1" "3"
 	echo "Removing current logs and indexes"
 	echo -----------------------------------------------------------
+	
+	gtar -zcvf fw_logs.tgz $FWDIR/log/*20*.*log*
+	gtar -zcvf log_indexes.tgz $RTDIR/log_indexes/*20*
+	cp $INDEXERDIR/data/FetchedFiles . 
+	
+	exit
+	
 	 rm -rf $RTDIR/log_indexes/*20*
 	 rm -f $INDEXERDIR/data/FetchedFiles
 	sleep 3
