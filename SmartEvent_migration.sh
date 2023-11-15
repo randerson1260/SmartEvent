@@ -93,7 +93,7 @@ function summary(){
 	echo Backup SCP server: $remoteServer
 	echo local backup directory: $localDir/sesBackup
 	echo remote backup directory: $remoteDir/sesBackup
-	echo local output directory: $localDir/output
+	echo local output directory: $localDir/sesOutput
 	echo
 	echo GAIA major version: $veajor
 	echo GAIA take: $verTake	
@@ -155,30 +155,30 @@ EOF
 		echo "Creating local backup directories"
 		echo -----------------------------------------------------------
 		mkdir -p ${localDir}/sesBackup
-		mkdir -p ${localDir}/output
+		mkdir -p ${localDir}/sesOutput
 		cd ${localDir}/sesBackup
 		
 		formatScreen "1" "3"
 		echo "Rotating logs"
 		echo -----------------------------------------------------------
 
-		fw logswitch > ${localDir}/output/logswitchOutput.txt
+		fw logswitch > ${localDir}/sesOutput/logswitchOutput.txt
 		sleep 3
-		fw logswitch -audit > ${localDir}/output/logswitchAuditOutput.txt
+		fw logswitch -audit > ${localDir}/sesOutput/logswitchAuditOutput.txt
 		sleep 3
 		
 		formatScreen "1" "3"
 		echo "Stopping services please be patient this may take a minute or two"
 		echo ---------------------------------------------------------------------
-		cpstop > ${localDir}/output/cpstopOutput.txt
+		cpstop > ${localDir}/sesOutput/cpstopOutput.txt
 		sleep 3
 		
 		formatScreen "1" "3"
 		echo "Compress logs and indexes"
 		echo -----------------------------------------------------------
-		gtar -zcvf fw_logs.tgz $FWDIR/log/*20*.*log* > ${localDir}/output/logCompressOutput.txt
-		gtar -zcvf log_indexes.tgz $RTDIR/log_indexes/*20* > ${localDir}/output/logIndexOutput.txt
-		cp $INDEXERDIR/data/FetchedFiles . > ${localDir}/output/cpFetchedFilesOutput.txt
+		gtar -zcvf fw_logs.tgz $FWDIR/log/*20*.*log* > ${localDir}/sesOutput/logCompressOutput.txt
+		gtar -zcvf log_indexes.tgz $RTDIR/log_indexes/*20* > ${localDir}/sesOutput/logIndexOutput.txt
+		cp $INDEXERDIR/data/FetchedFiles . > ${localDir}/sesOutput/cpFetchedFilesOutput.txt
 		sleep 3
 		
 		formatScreen "1" "3"
@@ -280,26 +280,19 @@ function restore(){
 	echo -----------------------------------------------------------
 	[[ -d ${localDir} ]] &&  -fr ${localDir}
 	mkdir -p ${localDir}/sesBackup
-	mkdir -p ${localDir}/output
+	mkdir -p ${localDir}/sesOutput
 	cd ${localDir}/sesBackup
 	sleep 3
 	
 	formatScreen "1" "3"
 	echo "Stopping services please be patient this may take a minute or two"
 	echo ---------------------------------------------------------------------
-	cpstop > ${localDir}/output/cpstopOutput.txt
+	cpstop > ${localDir}/sesOutput/cpstopOutput.txt
 	sleep 3
 	
 	formatScreen "1" "3"
 	echo "Removing current logs and indexes"
 	echo -----------------------------------------------------------
-	
-	gtar -zcvf fw_logs.tgz $FWDIR/log/*20*.*log*
-	gtar -zcvf log_indexes.tgz $RTDIR/log_indexes/*20*
-	cp $INDEXERDIR/data/FetchedFiles . 
-	
-	exit
-	
 	 rm -rf $RTDIR/log_indexes/*20*
 	 rm -f $INDEXERDIR/data/FetchedFiles
 	sleep 3
