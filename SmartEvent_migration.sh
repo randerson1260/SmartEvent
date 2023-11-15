@@ -278,7 +278,6 @@ function restore(){
 	formatScreen "1" "3"
 	echo "Creating local backup directories"
 	echo -----------------------------------------------------------
-	[[ -d ${localDir} ]] &&  -fr ${localDir}
 	mkdir -p ${localDir}/sesBackup
 	mkdir -p ${localDir}/sesOutput
 	cd ${localDir}/sesBackup
