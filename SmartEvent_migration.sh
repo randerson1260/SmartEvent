@@ -6,7 +6,6 @@ function header(){
   echo -ne "${fullLine}\n\e[s${fullLine}\e[u\e[3C  $(date) : $@  \n${fullLine}\n"
 }
 
-
 # global variable declarations
 
 veajor="$(awk '{print $NF}' /etc/cp-release)"
