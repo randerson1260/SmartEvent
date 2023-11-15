@@ -11,7 +11,7 @@ function header(){
 veajor="$(awk '{print $NF}' /etc/cp-release)"
 verTake="$(cpprod_util CPPROD_GetValue "CPUpdates/6.0/BUNDLE_${veajor//./_}_JUMBO_HF_MAIN" SU_Build_Take 0)"
 
-function foatScreen(){
+function formatScreen(){
 	if (( $1 == "1" )) 
 	then 
 		clear
@@ -24,17 +24,17 @@ function foatScreen(){
 }
 
 function getPassword(){
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo Please enter the backup user password
 	echo -----------------------------------------------------------
 	read -p 'Backup User Password: ' -s userPassword1
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo Please verify the backup user password
 	echo -----------------------------------------------------------
 	read -p 'Backup User Password: ' -s userPassword2
 	if [ "$userPassword1" != "$userPassword2" ]
 	then
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo -----------------------------------------------------------
 		echo passwords do not match, please retry
 		sleep 2
@@ -86,7 +86,7 @@ EOF
 }
 
 function summary(){
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo please verify entries
 	echo -----------------------------------------------------------
 	echo backup user login: $backupUser
@@ -132,18 +132,18 @@ EOF
 		
 		getPassword
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo Please enter the backup server IP address
 		echo -----------------------------------------------------------
 		read -p 'Backup SCP server IP: ' remoteServer
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo Please enter the base local backup base directory \(sesBackup and output will be added to your base directory\)
 		echo --------------------------------------------------------------------------------------------------------------
 		read -p 'Local backup directory: ' localDirRaw
 		localDir=$(echo "$localDirRaw" | sed 's:/*$::')
 				
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo Please enter the base remote backup base directory \(sesBackup will be added to your base directory\)
 		echo ----------------------------------------------------------------------------------------------------
 		read -p 'Remote backup directory: ' remoteDirRaw
@@ -151,14 +151,14 @@ EOF
 		
 		summary
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Creating local backup directories"
 		echo -----------------------------------------------------------
 		mkdir -p ${localDir}/sesBackup
 		mkdir -p ${localDir}/output
 		cd ${localDir}/sesBackup
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Rotating logs"
 		echo -----------------------------------------------------------
 
@@ -167,13 +167,13 @@ EOF
 		fw logswitch -audit > ${localDir}/output/logswitchAuditOutput.txt
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Stopping services please be patient this may take a minute or two"
 		echo ---------------------------------------------------------------------
 		cpstop > ${localDir}/output/cpstopOutput.txt
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Compress logs and indexes"
 		echo -----------------------------------------------------------
 		gtar -zcvf fw_logs.tgz $FWDIR/log/*20*.*log* > ${localDir}/output/logCompressOutput.txt
@@ -181,14 +181,14 @@ EOF
 		cp $INDEXERDIR/data/FetchedFiles . > ${localDir}/output/cpFetchedFilesOutput.txt
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Running Check Point migrate_server export"
 		echo -----------------------------------------------------------
 		cd $FWDIR/scripts
 		./migrate_server export -v ${veajor} ${localDir}/sesBackup/ses_Export.tgz
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Creating remote backup directory on SCP server"
 		echo -----------------------------------------------------------
 
@@ -198,7 +198,7 @@ EOF
 		unset SSHPASS
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Check backup SCP server for disc space"
 		echo -----------------------------------------------------------
 		localDisc=$(du -s ${localDir})
@@ -215,7 +215,7 @@ EOF
 		
 		if (( "$remoteSpace" <= "$localSpace" ))
 		then
-			foatScreen "1" "3"
+			formatScreen "1" "3"
 			echo -----------------------------------------------------------
 			echo Sorry there does not seem to be enough space on the remote server
 			echo please make room or change the destination, this script will teinate.
@@ -226,7 +226,7 @@ EOF
 		echo there is enough space to store the files on the remote server
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo "Copy compressed files to backup SCP server"
 		echo -----------------------------------------------------------
 		export SSHPASS=$userPassword1
@@ -234,7 +234,7 @@ EOF
 		unset SSHPASS
 		sleep 3
 		
-		foatScreen "1" "3"
+		formatScreen "1" "3"
 		echo -----------------------------------------------------------
 		echo "Next steps:"
 		echo "1) Shut down and rebuild the VM with ${veajor} ISO"
@@ -249,25 +249,25 @@ EOF
 }
 
 function restore(){
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo Please enter the backup userid
 	echo -----------------------------------------------------------
 	read -p 'Backup user name: ' backupUser
 	
 	getPassword
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo Please enter the Backup SCP server IP address
 	echo -----------------------------------------------------------
 	read -p 'Backup SCP server IP: ' remoteServer
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo Please enter the local backup base directory
 	echo -----------------------------------------------------------
 	read -p 'Local backup directory: ' localDirRaw
 	localDir=$(echo "$localDirRaw" | sed 's:/*$::')
 			
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo Please enter the remote backup base directory
 	echo -----------------------------------------------------------
 	read -p 'Remote backup directory: ' remoteDirRaw
@@ -275,7 +275,7 @@ function restore(){
 
 	summary
 
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Creating local backup directories"
 	echo -----------------------------------------------------------
 	[[ -d ${localDir} ]] &&  -fr ${localDir}
@@ -284,20 +284,20 @@ function restore(){
 	cd ${localDir}/sesBackup
 	sleep 3
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Stopping services please be patient this may take a minute or two"
 	echo ---------------------------------------------------------------------
 	cpstop > ${localDir}/output/cpstopOutput.txt
 	sleep 3
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Removing current logs and indexes"
 	echo -----------------------------------------------------------
-	 -rf $RTDIR/log_indexes/*20*
-	 -f $INDEXERDIR/data/FetchedFiles
+	 rm -rf $RTDIR/log_indexes/*20*
+	 rm -f $INDEXERDIR/data/FetchedFiles
 	sleep 3
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Download compressed files from SCP Server"
 	echo -----------------------------------------------------------
 	export SSHPASS=$userPassword1
@@ -305,7 +305,7 @@ function restore(){
 	unset SSHPASS
 	sleep 3
 	ß
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Extract logs and indexes"
 	echo -----------------------------------------------------------
 	gtar -zxvf ${localDir}/sesBackup/log_indexes.tgz --directory=/
@@ -313,20 +313,20 @@ function restore(){
 	cp ${localDir}/sesBackup/FetchedFiles $INDEXERDIR/data
 	sleep 3
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Running migrate_server import"
 	echo -----------------------------------------------------------
 	cd $FWDIR/scripts
 	./migrate_server import -v ${veajor} ${localDir}/sesBackup/ses_Export.tgz
 		
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Waiting for services to start" 
 	echo -----------------------------------------------------------
 	until $(api status | grep -q "API readiness test SUCCESSFUL"); do
 	sleep 1
 	done
 	
-	foatScreen "1" "3"
+	formatScreen "1" "3"
 	echo "Next steps:"
 	echo -----------------------------------------------------------
 	echo "1) Reset SIC in SmartConsole"
