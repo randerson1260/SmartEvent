@@ -300,7 +300,7 @@ function restore(){
 	echo "Download compressed files from SCP Server"
 	echo -----------------------------------------------------------
 	export SSHPASS=$userPassword1
-	sshpass -e scp -o "StrictHostKeyChecking no" ${backupUser}@${remoteServer}:${remoteDir}/sesBackup/* ${remoteDir}/sesBackup/
+	sshpass -e scp -o "StrictHostKeyChecking no" ${backupUser}@${remoteServer}:${remoteDir}/sesBackup/* ${localDir}/sesBackup/
 	unset SSHPASS
 	sleep 3
 	ß
