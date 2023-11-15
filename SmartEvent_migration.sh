@@ -1,5 +1,5 @@
 #!/bin/bash --login
-# version 10.1
+# version 10.2
 
 function header(){
   fullLine=$(printf '#%.0s' $(seq 1 $(( $(tput cols) - 1)) ))
